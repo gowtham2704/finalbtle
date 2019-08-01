@@ -1,0 +1,1359 @@
+Matrimoni:
+
+Admin All codes:
+<div class="container">
+            <table class="table table-striped">
+                <thead>
+                    <th>UserId</th>
+                    <th>MobileNo</th>
+                    <th>Email</th>
+                    <th>Operations</th>
+                </thead>
+                <tbody>
+                   <tr *ngFor="let list of userlist">
+                    <td>{{list.userId}}</td>
+                    <td>{{list.mobileNo}}</td>
+                    <td>{{list.email}}</td>
+                    <td><button class="btn btn-danger" (click)="deleteUser(list)">Delete</button>
+                   </tr> 
+     </tbody>
+</table>
+
+ts:::
+
+import { Component, OnInit } from '@angular/core';
+import { MatrimoniServicesService } from '../../Services/matrimoni-services.service';
+import { Listusers } from '../../classes/listusers';
+
+@Component({
+  selector: 'app-adminhome',
+  templateUrl: './adminhome.component.html',
+  styleUrls: ['./adminhome.component.css']
+})
+export class AdminhomeComponent implements OnInit {
+
+
+  public userlist:Listusers[];
+  constructor(private service:MatrimoniServicesService) { }
+
+  ngOnInit() {
+
+    this.service.listusers().subscribe((data)=>{
+      console.log(data);
+      this.userlist=data;
+    },(error)=>{
+      console.log(error);
+    });
+  }
+  deleteUser(list)
+  {
+    alert(list.userId);
+    this.service.deleteuser(list.userId).subscribe((data)=>{
+      this.userlist.splice(this.userlist.indexOf(list),1);
+    },(error)=>{
+      console.log(error);
+    })
+  }
+}
+
+indexfiles:
+cscs:
+.heading{
+    text-align: center;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serifs;
+    background: aqua;
+    color: black;
+}
+.container{
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    left: 50%;
+    top: 25%;
+    transform: translate(-50%, -50%);
+}
+.link{
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    left: 50%;
+    top: 45%;
+    transform: translate(-50%, -50%);
+}
+.link1{
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    left: 63%;
+    top: 45%;
+    transform: translate(-50%, -50%);
+}
+
+html:
+
+<div class="heading">
+   <h2>Welcome to GGA Matrimoni</h2>
+</div>
+<div class="container center_div" style="width: 500px" >
+   <div class="form group">
+      <label for="id">LoginId</label>
+      <input type="text" name="id" class="form-control" #id>
+   </div>
+   <div class="form group">
+      <label for="pass">Password</label>
+      <input type="password" name="pass" class="form-control" #pass>
+   </div><br>
+   <button class="btn btn-success" (click)="verifyuser(id.value,pass.value)">Login</button>
+   <br>
+</div>
+<div class="link">
+      <a [routerLink]="['/newuser']">New User? Click Here</a>
+</div>
+<div class="link1">
+      <a [routerLink]="['/admin']">AdminLogin</a>
+</div>
+
+ts:
+import { Component, OnInit } from '@angular/core';
+import { MatrimoniServicesService } from '../../Services/matrimoni-services.service';
+import { Router } from '@angular/router';
+import { Listusers } from '../../classes/listusers';
+
+@Component({
+  selector: 'app-indexcomponent',
+  templateUrl: './indexcomponent.component.html',
+  styleUrls: ['./indexcomponent.component.css']
+})
+export class IndexcomponentComponent implements OnInit {
+
+  private userlist:Listusers[];
+  constructor(private service:MatrimoniServicesService,private _router:Router) { }
+
+  ngOnInit() {
+
+    this.service.listusers().subscribe((data)=>{
+        this.userlist=data;
+        console.log(this.userlist);
+    },(error)=>{
+      console.log(error);
+    });
+
+  }
+  verifyuser(id,pass)
+  {
+      let userid=this.userlist.find(ob=>ob['userId']===id);
+      if(userid!=undefined)
+      {
+        let user=new Listusers();
+        user=userid;
+        if(pass==user.password)
+        {
+          alert("Welcome User");
+          this.service.setter(user);
+          this._router.navigate(['/userhome']);
+        }
+      }
+  }
+}
+
+Matrimoni-admin files:
+
+matrimoni css:
+
+.heading{
+    text-align: center;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serifs;
+    background: aqua;
+    color: black;
+}
+.container{
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    left: 50%;
+    top: 25%;
+    transform: translate(-50%, -50%);
+}
+
+html:
+<div class="heading">
+    <h2>Admin Login</h2>
+</div>
+<div class="container" style="width: 500px">
+    <form>
+            <div class="form group">
+                    <label for="adminId">AdminId</label>
+                    <input type="text" name="adminId" class="form-control" #id>
+            </div>
+            <div class="form group">
+                        <label for="password">Password</label>
+                        <input type="text" name="password" class="form-control" #pass><br>
+            </div>
+                <button (click)="verifyadmin(id.value,pass.value)" class="btn btn-success">Login</button>
+    </form>
+</div>
+
+ts:
+
+import { Component, OnInit } from '@angular/core';
+import { MatrimoniServicesService } from '../../Services/matrimoni-services.service';
+import { MatrimoniAdmin } from '../../classes/matrimoni-admin';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-matrimoni-admin',
+  templateUrl: './matrimoni-admin.component.html',
+  styleUrls: ['./matrimoni-admin.component.css']
+})
+export class MatrimoniAdminComponent implements OnInit {
+
+  private adminlist:MatrimoniAdmin[];
+
+  constructor(private adminserivce:MatrimoniServicesService,private _router:Router) { }
+
+  ngOnInit() {
+      this.adminserivce.getAdmin().subscribe((admins)=>{
+        this.adminlist=admins;       
+        console.log(this.adminlist);      
+      },(error)=>{
+        console.log(error);
+      });
+  }
+
+  verifyadmin(id,pass)
+  {
+    let adminid=this.adminlist.find(ob=>ob['adminId']===id);
+    console.log(adminid);
+    if(adminid!=undefined)
+    {
+      let admin=new MatrimoniAdmin(); 
+      admin=adminid;
+      if(pass==admin.password)
+      {
+        alert('WelcomeAdmin');
+        this._router.navigate(['/adminhome']);
+      }
+      else{
+        alert('INVALID CREDENTIAL');
+      }
+    }else{
+      alert('INVALID CREDENTIAL');
+    }
+  }
+}
+
+
+newuser files:
+
+css:
+.container{
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    left: 50%;
+    top: 30%;
+    transform: translate(-50%, -50%);
+}
+.heading{
+    text-align: center;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serifs;
+    background: aqua;
+    color: black;
+}
+
+html:
+
+<div class="heading">
+    <h2>Register User</h2>
+</div>
+<div class="container">
+    <div class="form group">
+        <label for="userId">UserId</label>
+        <input type="text" name="userId" class="form-control" [(ngModel)]="user.userId">
+    </div>
+    <div class="form group">
+        <label for="pass">Password</label>
+        <input type="password" name="pass" class="form-control" [(ngModel)]="user.password">
+    </div>
+    <div class="form group">
+        <label for="cpassword">Confirm Password</label>
+        <input type="password" name="cpassword" class="form-control">
+     </div>
+    <div class="form group">
+        <label for="mobileNo">Mobile No</label>
+         <input type="text" name="mobileNo" class="form-control" [(ngModel)]="user.mobileNo">
+    </div>
+    <div class="form group">
+            <label for="email">Email</label>
+         <input type="text" name="email" class="form-control" [(ngModel)]="user.email"><br>
+     </div>
+     <div>
+     <button (click)="saveuser()" class="btn btn-primary">Save</button>
+    </div>
+</div>
+
+ts:
+import { Component, OnInit } from '@angular/core';
+import { Listusers } from '../../classes/listusers';
+import { Router } from '@angular/router';
+import { MatrimoniServicesService } from '../../Services/matrimoni-services.service';
+
+@Component({
+  selector: 'app-newuser',
+  templateUrl: './newuser.component.html',
+  styleUrls: ['./newuser.component.css']
+})
+export class NewuserComponent implements OnInit {
+
+  private user=new Listusers();
+  constructor(private _service:MatrimoniServicesService,private _router:Router) { }
+
+  ngOnInit() {
+  }
+
+  saveuser()
+  {
+      this._service.saveuser(this.user).subscribe((data)=>{
+        console.log(data);     
+      });
+      sessionStorage.setItem('userid',this.user.userId);
+      this._router.navigate(['/newuserpage2']);
+  }
+}
+
+
+newuserpage2:
+css:
+.heading{
+    text-align: center;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serifs;
+    background: aqua;
+    color: black;
+}
+.container{
+   
+    width: 400px;
+    height: 300px;
+    position: absolute;
+    left: 50%;
+    top: 25%;
+    transform: translate(-50%,-50%);
+}
+
+html:
+
+<div class="heading">
+    <h2>Register User</h2>
+</div>
+    <div class="container">
+        <div class="form group">
+            <label for="name">Name:</label>
+            <input type="text" name="name" class="form-control" [(ngModel)]="userform.name">
+        </div><br>
+        <div class="form group" [(ngModel)]="userform.gender">
+                <label for="optradio">Gender:</label><br>
+                <label class="radio-inline"><input type="radio" name="optradio" value="Male" [(ngModel)]="userform.gender">Male</label>
+                <label class="radio-inline"><input type="radio" name="optradio" value="Female" [(ngModel)]="userform.gender">Female</label>                
+        </div><br>  
+        <div class="form group">
+            <label for="age">Age:</label>
+            <input type="number" name="age" class="form-control"  [(ngModel)]="userform.age">
+        </div><br>
+        <div class="form group">
+                <label for="dob">DOB:</label>
+                <input type="text" name="dob" class="form-control" placeholder="dd/mm/yyyy"  [(ngModel)]="userform.dob">
+              
+        </div><br>
+        <div class="form group">
+                <label for="bg">BloodGroup:</label>
+                <input type="text" name="bg" class="form-control"  [(ngModel)]="userform.bloodgroup">
+        </div><br>
+        <div class="md-form">
+                <label for="address" id="l4">Address:</label>
+                <textarea type="text" name="address" class="md-textarea md-textarea-auto form-control"  [(ngModel)]="userform.address"></textarea>        
+         </div><br>
+         <div class="form group">
+                <label for="bg">CountryLiving:</label>
+                <input type="text" name="bg" class="form-control"  [(ngModel)]="userform.countryliving">
+        </div><br>
+         <button (click)="saveuser()" class="btn btn-primary">Save</button>
+    </div>
+   
+ts:
+
+import { Component, OnInit } from '@angular/core';
+import { Reguserform2 } from '../../classes/reguserform2';
+import{ Router } from '@angular/router';
+import { MatrimoniServicesService } from '../../Services/matrimoni-services.service';
+
+@Component({
+  selector: 'app-newuserpage2',
+  templateUrl: './newuserpage2.component.html',
+  styleUrls: ['./newuserpage2.component.css']
+})
+export class Newuserpage2Component implements OnInit {
+
+  private userform=new Reguserform2();
+
+ constructor(private service:MatrimoniServicesService,private router:Router ) { }
+
+  ngOnInit() {
+    let userid=sessionStorage.getItem('userid');
+    this.userform.userid=userid;
+   
+  } 
+  saveuser()
+  {
+    this.service.saveuserform2(this.userform).subscribe((data)=>{
+      console.log(data);
+    },(error)=>{
+      console.log(error);
+    });
+    this.router.navigate(['/newuserpage3']);
+  }
+}
+
+newuserpage3:
+css:
+.heading{
+    text-align: center;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serifs;
+    background: aqua;
+    color: black;
+}
+.container1{
+   
+    width: 400px;
+    height: 300px;
+    position: absolute;
+    left: 25%;
+    top: 25%;
+    transform: translate(-50%,-50%);
+}
+.container2{
+   
+    width: 400px;
+    height: 300px;
+    position: absolute;
+    left: 75%;
+    top: 25%;
+    transform: translate(-50%,-50%);
+}
+
+html:
+<div class="heading">
+    <h2>Register User</h2>
+</div>
+
+<div class="container1">
+
+MaritalStatus:<br>
+<input type="radio" name="MaritalStatus" value="Divorced" [(ngModel)]="register2.maritalstatus">Divorced<br>
+<input type="radio" name="MaritalStatus" value="Single" [(ngModel)]="register2.maritalstatus">Single<br>
+<input type="radio" name="MaritalStatus" value="Married" [(ngModel)]="register2.maritalstatus">Married<br>
+<input type="radio" name="MaritalStatus" value="Widow" [(ngModel)]="register2.maritalstatus">Widow<br><br>
+
+Religion  <select [(ngModel)]="register2.religion">    
+    
+    <option value="Select">select</option>
+    <option value="Hindu" >Hindu</option>
+    <option value="Muslim">Muslim</option>
+    <option value="Christian" >Christian</option>
+    <option value="Jain" >Jain</option>
+    <option value="Sikkhist">Sikkist</option>
+    <option value="Buddhist">Buddhist</option>
+  </select><br><br>
+  
+Caste  <select [(ngModel)]="register2.caste">
+     <option value="select">select</option>
+    <option value="BC" >BC</option>
+    <option value="SC" >SC</option>
+    <option value="ST" >ST</option>
+    <option value="OC" >OC</option>
+    <option value="FC" >FC</option>
+    <option value="MBC" >MBC</option>
+</select><br><br>
+
+ Rasi  <select [(ngModel)]="register2.rasi"> 
+     <option value="select" ></option>
+    <option value="Capricorn" >Capricorn</option>
+    <option value="Aquarius" >Aquarius</option>
+    <option value="Pisces" >Pisces</option>
+    <option value="Aries" >Aries</option>
+    <option value="Taurus" >Taurus</option>
+    <option value="Gemini" >Gemini</option>
+    <option value="Cancer" >Cancer</option>
+    <option value="Leo" >Leo</option>
+    <option value="Libra" >Libra</option>
+    <option value="Scorpio">Scorpio</option>
+    <option value="Ophiuchus" >Ophiuchus</option>
+    <option value="Sagittarius" >Sagittarius</option>
+</select><br><br>
+
+Star  <select [(ngModel)]="register2.star"> 
+    <option value="select"></option>
+    <option value="Ashwini" >Ashwini</option>
+    <option value="Rohini" >Rohini</option>
+    <option value="Krithika" >Krithika</option>
+    <option value="Chitra" >Chitra</option>
+    <option value="Hashta" >Hashta</option>
+    <option value="Swathi" >swathi</option>
+    <option value="Cancer" >Visakha</option>
+    <option value="Leo" >Anuradha</option>
+    <option value="Libra" >Mula</option>
+    <option value="Scorpio" >Uttara Asadha</option>
+    <option value="Ophiuchus" >Shravana</option>
+    <option value="Sagittarius" >Dhanishta</option>
+</select><br><br>
+FamilyStatus:<br> <input type="radio" name="FamilyStatus" value="Rich" [(ngModel)]="register2.familystatus">Rich<br>
+<input type="radio" name="FamilyStatus" value="MiddleClass" [(ngModel)]="register2.familystatus">MiddleClass<br>
+<input type="radio" name="FamilyStatus" value="LowerClass" [(ngModel)]="register2.familystatus">LowerClass<br><br>
+
+Familytype:<br>
+ <input type="radio" name="Familytype" value="Nuclear" [(ngModel)]="register2.familytype">Nuclear<br>
+ <input type="radio" name="Familytype" value="Joint" [(ngModel)]="register2.familytype">Joint<br>
+ <input type="radio" name="Familytype" value="Others" [(ngModel)]="register2.familytype">others<br><br>
+
+MotherTongue <select [(ngModel)]="register2.mothertongue"> <option value="select">select</option>
+    <option value="Tamil" >Tamil</option>
+    <option value="English" >English</option>
+    <option value="Telugu" >Telugu</option>
+    <option value="Malayalam" >Malayalam</option>
+    <option value="Urudu" >Urudu</option>
+    <option value="Hindi" >Hindi</option>
+    <option value="Arabic" >Arabic</option>
+    <option value="Bengali" >Bengali</option>
+    <option value="Chinese" >Chinese</option>
+    <option value="Japanese" >Japanese</option>
+    <option value="Marathi" >Marathi</option>
+    <option value="Others" >Others</option></select>
+    <br><br>
+
+    HighestEducation <input type="text" name="name" [(ngModel)]="register2.highesteducation"><br><br>
+
+    Employeein <input type="text" name="name" [(ngModel)]="register2.employeein"><br><br>
+</div>
+<div class="container2">
+    Occupation <input type="text" name="name" [(ngModel)]="register2.occupation"><br><br>
+
+    AnnualIncome <input type="text" name="name" [(ngModel)]="register2.annualincome"> INR<br><br>
+
+    Height <input type="text" name="name" [(ngModel)]="register2.height"> cms<br><br>
+
+    Weight <input type="text" name="name" [(ngModel)]="register2.weight"> kg<br><br>
+
+    PhysicallyChallenged:<br>  <input type="radio" name="PhysicallyChallenged" value="Yes" [(ngModel)]="register2.disability">yes<br>
+    <input type="radio" name="PhysicallyChallenged" value="No" [(ngModel)]="register2.disability">No<br><br>
+
+   
+    Bodytype :<br><input type="radio" name="BodyType" value="Lean" [(ngModel)]="register2.bodytype">Lean<br>
+    <input type="radio" name="BodyType" value="Obese"[(ngModel)]="register2.bodytype">Obese<br>
+    <input type="radio" name="BodyType" value="Fit" [(ngModel)]="register2.bodytype">Fit<br><br>
+    
+    
+    EatingHabit :<br> <input type="radio" name="EatingHabit" value="Veg" [(ngModel)]="register2.eatinghabit">Vegeterian<br>
+    <input type="radio" name="EatingHabit" value="NonVeg" [(ngModel)]="register2.eatinghabit">Non-Vegeterian<br>
+    <input type="radio" name="EatingHabit" value="Egg" [(ngModel)]="register2.eatinghabit">Eggeterian<br><br>
+
+
+
+    Drinking:<br>  <input type="radio" name="drnks" value="yes" [(ngModel)]="register2.drinkinghabit">Yes<br>
+  <input type="radio" name="drnks" value="No" [(ngModel)]="register2.drinkinghabit">No<br><br>
+  
+
+  SmokingHabit:<br>   <input type="radio" name="SmokingHabit" value="Yes" [(ngModel)]="register2.smokinghabit">Yes<br>
+<input type="radio" name="SmokingHabit" value="No" [(ngModel)]="register2.smokinghabit">No<br><br>
+
+<button class="btn btn-success" (click)="savePersonal()">Save</button>
+</div>
+
+ts:
+import { Component, OnInit } from '@angular/core';
+import { Reguserform3 } from '../../classes/reguserform3';
+import { Router } from '@angular/router';
+import { MatrimoniServicesService } from '../../Services/matrimoni-services.service';
+
+@Component({
+  selector: 'app-newuserpage3',
+  templateUrl: './newuserpage3.component.html',
+  styleUrls: ['./newuserpage3.component.css']
+})
+export class Newuserpage3Component implements OnInit {
+
+  private register2=new Reguserform3();
+  constructor(private service:MatrimoniServicesService,private _router:Router) { }
+
+  ngOnInit() {
+    let userid=sessionStorage.getItem('userid');
+    this.register2.userid=userid;
+  }
+  savePersonal()
+  {
+    this.service.saveuserform3(this.register2).subscribe((data)=>
+     {
+        console.log(data);
+     },(error)=>{
+        console.log(error);
+   });
+   alert("Profile Saved Successfully");
+   this._router.navigate(['/index']);
+  }
+}
+
+userhome:
+
+css:
+.avatar{
+    background: violet;
+    width: 200px;
+    height: 200px;
+    position: absolute;
+    top: 13%;
+    left: 7%;
+    transform:translate(-50%,-50%);
+}
+.container{
+    width: 400px;
+    height: 300px;
+    position: absolute;
+    left: 25%;
+    top: 30%;
+    transform: translate(-50%,-50%);
+}
+.button1{
+    width: 400px;
+    height: 300px;
+    position: absolute;
+    left: 25%;
+    top: 20%;
+    transform: translate(-50%,-50%);
+}
+.button2{
+    width: 400px;
+    height: 300px;
+    position: absolute;
+    left: 32%;
+    top: 20%;
+    transform: translate(-50%,-50%);
+}
+.button3{
+    width: 400px;
+    height: 300px;
+    position: absolute;
+    right: -25%;
+    top: 20%;
+    transform: translate(-50%,-50%);
+}
+
+html:
+<div class="avatar">
+
+</div>
+<div class="container">
+    User_Name: <span style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif" style="font-size: 120%" style="color: blue">{{listuser.userId}}</span>
+</div>
+<div class="button1">
+    <button class="btn btn-primary" (click)="viewProfile()" >ViewProfile</button>
+</div>
+<div class="button2">
+        <button class="btn btn-primary" >Search</button>
+</div>
+<div class="button3">
+        <button class="btn btn-primary" (click)="logout()" >Logout</button>
+</div>
+<div class="list">
+
+</div>
+
+ts:
+
+import { Component, OnInit } from '@angular/core';
+import { MatrimoniServicesService } from '../../Services/matrimoni-services.service';
+import { Router } from '@angular/router';
+import { Listusers } from '../../classes/listusers';
+import { Reguserform2 } from '../../classes/reguserform2';
+import { Reguserform3 } from '../../classes/reguserform3';
+
+
+@Component({
+  selector: 'app-userhome',
+  templateUrl: './userhome.component.html',
+  styleUrls: ['./userhome.component.css']
+})
+export class UserhomeComponent implements OnInit {
+
+  private listuser=new Listusers();
+  private userformtwo=new Reguserform2();
+  private userformthree=new Reguserform3();
+  constructor(private service:MatrimoniServicesService,private router:Router) { }
+
+  ngOnInit() {
+      this.listuser=this.service.getter();
+      this.service.getuserform2().subscribe((data)=>{
+        this.userformtwo=data;
+        this.service.setform2(this.userformtwo);
+      });
+      this.service.getuserform3().subscribe((data)=>{
+        this.userformthree=data;
+        this.service.setform3(this.userformthree);
+      });
+  }
+  viewProfile()
+  {
+      this.router.navigate(['/userprofile']);
+  }
+  logout()
+  {
+    this.router.navigate(['/index']);
+  }
+}
+
+user profile
+css:
+.container{
+    width: 300px;
+    height: 400px;
+    position: absolute;
+    top: 3%;
+    left: 7%;
+}
+.container2{
+    width: 300px;
+    height: 400px;
+    position: absolute;
+    top: 3%;
+    left: 31%;
+}
+.container3{
+    width: 300px;
+    height: 400px;
+    position: absolute;
+    top: 3%;
+    left: 61%;
+}
+.button{
+    width: 30px;
+    height: 40px;
+    position: absolute;
+    top: 85%;
+    left: 90%;
+}
+
+html:
+
+<div class="container">
+        <div class="form group">
+                <label for="name">Name:</label>
+                <input type="text" name="name" class="form-control" [(ngModel)]="userform.name">
+            </div>
+            <div class="form group">
+                <label for="pass">Password</label>
+                <input type="password" name="pass" class="form-control" [(ngModel)]="user.password">
+            </div>
+            <div class="form group">
+                <label for="mobileNo">Mobile No</label>
+                 <input type="text" name="mobileNo" class="form-control" [(ngModel)]="user.mobileNo">
+            </div>
+            <div class="form group">
+                    <label for="email">Email</label>
+                 <input type="text" name="email" class="form-control" [(ngModel)]="user.email"><br>
+             </div>
+       
+                <div class="form group" [(ngModel)]="userform.gender">
+                        <label for="optradio">Gender:</label><br>
+                        <label class="radio-inline"><input type="radio" name="optradio" value="Male" [(ngModel)]="userform.gender">Male</label>
+                        <label class="radio-inline"><input type="radio" name="optradio" value="Female" [(ngModel)]="userform.gender">Female</label>                
+                </div><br>  
+                <div class="form group">
+                    <label for="age">Age:</label>
+                    <input type="number" name="age" class="form-control"  [(ngModel)]="userform.age">
+                </div><br>
+                <div class="form group">
+                        <label for="dob">DOB:</label>
+                        <input type="text" name="dob" class="form-control" placeholder="dd/mm/yyyy"  [(ngModel)]="userform.dob">
+                      
+                </div><br>
+                <div class="form group">
+                        <label for="bg">BloodGroup:</label>
+                        <input type="text" name="bg" class="form-control"  [(ngModel)]="userform.bloodgroup">
+                </div><br>
+                <div class="md-form">
+                        <label for="address" id="l4">Address:</label>
+                        <textarea type="text" name="address" class="md-textarea md-textarea-auto form-control"  [(ngModel)]="userform.address"></textarea>        
+                 </div><br>
+</div>
+<div class="container2">
+             
+                 <div class="form group">
+                        <label for="bg">CountryLiving:</label>
+                        <input type="text" name="bg" class="form-control"  [(ngModel)]="userform.countryliving">
+                </div><br>
+                MaritalStatus:<br>
+<input type="radio" name="MaritalStatus" value="Divorced" [(ngModel)]="register2.maritalstatus">Divorced<br>
+<input type="radio" name="MaritalStatus" value="Single" [(ngModel)]="register2.maritalstatus">Single<br>
+<input type="radio" name="MaritalStatus" value="Married" [(ngModel)]="register2.maritalstatus">Married<br>
+<input type="radio" name="MaritalStatus" value="Widow" [(ngModel)]="register2.maritalstatus">Widow<br><br>
+
+Religion  <select [(ngModel)]="register2.religion">    
+    
+    <option value="Select">select</option>
+    <option value="Hindu" >Hindu</option>
+    <option value="Muslim">Muslim</option>
+    <option value="Christian" >Christian</option>
+    <option value="Jain" >Jain</option>
+    <option value="Sikkhist">Sikkist</option>
+    <option value="Buddhist">Buddhist</option>
+  </select><br><br>
+  
+Caste  <select [(ngModel)]="register2.caste">
+     <option value="select">select</option>
+    <option value="BC" >BC</option>
+    <option value="SC" >SC</option>
+    <option value="ST" >ST</option>
+    <option value="OC" >OC</option>
+    <option value="FC" >FC</option>
+    <option value="MBC" >MBC</option>
+</select><br><br>
+
+ Rasi  <select [(ngModel)]="register2.rasi"> 
+     <option value="select" ></option>
+    <option value="Capricorn" >Capricorn</option>
+    <option value="Aquarius" >Aquarius</option>
+    <option value="Pisces" >Pisces</option>
+    <option value="Aries" >Aries</option>
+    <option value="Taurus" >Taurus</option>
+    <option value="Gemini" >Gemini</option>
+    <option value="Cancer" >Cancer</option>
+    <option value="Leo" >Leo</option>
+    <option value="Libra" >Libra</option>
+    <option value="Scorpio">Scorpio</option>
+    <option value="Ophiuchus" >Ophiuchus</option>
+    <option value="Sagittarius" >Sagittarius</option>
+</select><br><br>
+
+Star  <select [(ngModel)]="register2.star"> 
+    <option value="select"></option>
+    <option value="Ashwini" >Ashwini</option>
+    <option value="Rohini" >Rohini</option>
+    <option value="Krithika" >Krithika</option>
+    <option value="Chitra" >Chitra</option>
+    <option value="Hashta" >Hashta</option>
+    <option value="Swathi" >swathi</option>
+    <option value="Cancer" >Visakha</option>
+    <option value="Leo" >Anuradha</option>
+    <option value="Libra" >Mula</option>
+    <option value="Scorpio" >Uttara Asadha</option>
+    <option value="Ophiuchus" >Shravana</option>
+    <option value="Sagittarius" >Dhanishta</option>
+</select><br><br>
+FamilyStatus:<br> <input type="radio" name="FamilyStatus" value="Rich" [(ngModel)]="register2.familystatus">Rich<br>
+<input type="radio" name="FamilyStatus" value="MiddleClass" [(ngModel)]="register2.familystatus">MiddleClass<br>
+<input type="radio" name="FamilyStatus" value="LowerClass" [(ngModel)]="register2.familystatus">LowerClass<br><br>
+
+Familytype:<br>
+ <input type="radio" name="Familytype" value="Nuclear" [(ngModel)]="register2.familytype">Nuclear<br>
+ <input type="radio" name="Familytype" value="Joint" [(ngModel)]="register2.familytype">Joint<br>
+ <input type="radio" name="Familytype" value="Others" [(ngModel)]="register2.familytype">others<br><br>
+
+MotherTongue <select [(ngModel)]="register2.mothertongue"> <option value="select">select</option>
+    <option value="Tamil" >Tamil</option>
+    <option value="English" >English</option>
+    <option value="Telugu" >Telugu</option>
+    <option value="Malayalam" >Malayalam</option>
+    <option value="Urudu" >Urudu</option>
+    <option value="Hindi" >Hindi</option>
+    <option value="Arabic" >Arabic</option>
+    <option value="Bengali" >Bengali</option>
+    <option value="Chinese" >Chinese</option>
+    <option value="Japanese" >Japanese</option>
+    <option value="Marathi" >Marathi</option>
+    <option value="Others" >Others</option></select>
+    <br><br>
+
+    HighestEducation <input type="text" name="name" [(ngModel)]="register2.highesteducation"><br><br>
+    
+</div>
+<div class="container3">
+
+
+    Employeein <input type="text" name="name" [(ngModel)]="register2.employeein"><br><br>
+
+    Occupation <input type="text" name="name" [(ngModel)]="register2.occupation"><br><br>
+
+    AnnualIncome <input type="text" name="name" [(ngModel)]="register2.annualincome"> INR<br><br>
+
+    Height <input type="text" name="name" [(ngModel)]="register2.height"> cms<br><br>
+
+    Weight <input type="text" name="name" [(ngModel)]="register2.weight"> kg<br><br>
+
+    PhysicallyChallenged:<br>  <input type="radio" name="PhysicallyChallenged" value="Yes" [(ngModel)]="register2.disability">yes<br>
+    <input type="radio" name="PhysicallyChallenged" value="No" [(ngModel)]="register2.disability">No<br><br>
+
+   
+    Bodytype :<br><input type="radio" name="BodyType" value="Lean" [(ngModel)]="register2.bodytype">Lean<br>
+    <input type="radio" name="BodyType" value="Obese"[(ngModel)]="register2.bodytype">Obese<br>
+    <input type="radio" name="BodyType" value="Fit" [(ngModel)]="register2.bodytype">Fit<br><br>
+    
+    
+    EatingHabit :<br> <input type="radio" name="EatingHabit" value="Veg" [(ngModel)]="register2.eatinghabit">Vegeterian<br>
+    <input type="radio" name="EatingHabit" value="NonVeg" [(ngModel)]="register2.eatinghabit">Non-Vegeterian<br>
+    <input type="radio" name="EatingHabit" value="Egg" [(ngModel)]="register2.eatinghabit">Eggeterian<br><br>
+
+
+
+    Drinking:<br>  <input type="radio" name="drnks" value="yes" [(ngModel)]="register2.drinkinghabit">Yes<br>
+  <input type="radio" name="drnks" value="No" [(ngModel)]="register2.drinkinghabit">No<br><br>
+  
+
+  SmokingHabit:<br>   <input type="radio" name="SmokingHabit" value="Yes" [(ngModel)]="register2.smokinghabit">Yes<br>
+<input type="radio" name="SmokingHabit" value="No" [(ngModel)]="register2.smokinghabit">No<br><br>
+</div>
+<div class="button">
+    <button class="btn btn-success">Save Edit</button>
+</div>
+
+ts:
+
+import { Component, OnInit } from '@angular/core';
+import { Listusers } from '../../classes/listusers';
+import { Reguserform2 } from '../../classes/reguserform2';
+import { Reguserform3 } from '../../classes/reguserform3';
+import { MatrimoniServicesService } from '../../Services/matrimoni-services.service';
+
+@Component({
+  selector: 'app-userprofile',
+  templateUrl: './userprofile.component.html',
+  styleUrls: ['./userprofile.component.css']
+})
+export class UserprofileComponent implements OnInit {
+
+  
+  private user=new Listusers();
+  private userform=new Reguserform2();
+  private register2=new Reguserform3();
+  constructor(private service:MatrimoniServicesService) { }
+
+  ngOnInit() {
+      this.user=this.service.getter();
+      this.userform=this.service.getform2();
+      this.register2=this.service.getform3();
+  }
+}
+
+usersuggesions:
+css:
+html:
+<div class="container">
+
+    <div class="form group">
+        <label for="fromage">From Age</label>
+        <input type="number" name="fromage" class="form-control">
+    </div>
+    <div class="form group">
+        <label for="toage">To Age</label>
+        <input type="number" name="toage" class="form-control">
+    </div>
+    <div class="form group">
+        <label for="msts">MaritalStatus</label>
+        <input type="number" name="msts" class="form-control">
+    </div>
+    <div class="form group">
+         <label for="religion">Religion</label>
+         <input type="number" name="religion" class="form-control">
+    </div>
+    <div class="form group">
+        <label for="religion">Religion</label>
+        <input type="number" name="religion" class="form-control">
+    </div>
+</div>
+
+services/service.ts:
+
+import { Injectable } from '@angular/core';
+import { Http,Response,Headers,RequestOptions } from '@angular/http';
+import "rxjs/add/operator/map";
+import { Listusers } from '../classes/listusers';
+import { Reguserform2 } from '../classes/reguserform2';
+import { Reguserform3 } from '../classes/reguserform3';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class MatrimoniServicesService {
+
+  constructor(private _http:Http) { }
+  private listuser=new Listusers();
+  private userform2=new Reguserform2();
+  private userform3=new Reguserform3();
+  private baseurl:string="http://localhost:3030/index";
+  private headers=new Headers({'Content-Type':'application/json'});
+  private options=new RequestOptions({headers:this.headers});
+
+  getAdmin()
+  {
+    return this._http.get(this.baseurl+'/getadmin',this.options).map((response:Response)=>response.json());
+  }
+  listusers()
+  {
+    return this._http.get(this.baseurl+'/listusers',this.options).map((response:Response)=>response.json());
+  }
+  deleteuser(userId:string)
+  {
+      return this._http.delete(this.baseurl+'/deleteuser/'+userId,this.options).map((response:Response)=>response.json());
+  }
+ saveuser(newuser:Listusers)
+ {
+   return this._http.post(this.baseurl+"/savenewuser",JSON.stringify(newuser),this.options).map((response:Response)=>response.json());
+ }
+ saveuserform2(userform2:Reguserform2)
+ {
+   return this._http.post(this.baseurl+"/savenewuserform2",JSON.stringify(userform2),this.options).map((response:Response)=>response.json());
+ }
+ saveuserform3(userform3:Reguserform3)
+ {
+   return this._http.post(this.baseurl+"/savenewuserform3",JSON.stringify(userform3),this.options).map((response:Response)=>response.json());
+ }
+ getuserform2()
+ {
+   return this._http.get(this.baseurl+"/getformtwo/"+this.listuser.userId,this.options).map((response:Response)=>response.json());
+ }
+ getuserform3()
+ {
+   return this._http.get(this.baseurl+"/getformthree/"+this.listuser.userId,this.options).map((response:Response)=>response.json());
+ }
+ setter(listuser:Listusers)
+ {
+   this.listuser=listuser;
+ }
+ getter()
+ {
+   return this.listuser;
+ }
+ setform2(userform2:Reguserform2)
+ {
+    this.userform2=userform2;
+ }
+ getform2()
+ {
+    return this.userform2;
+ }
+ setform3(userform3:Reguserform3)
+ {
+    this.userform3=userform3;
+ }
+ getform3()
+ {
+    return this.userform3;
+ }
+
+}
+
+Controller.springboot:
+package com.dsrc.base.MatrimoniController;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import com.dsrc.base.MatrimoniBeans.Admin;
+import com.dsrc.base.MatrimoniBeans.MatrimoniRegisteredUsers;
+import com.dsrc.base.MatrimoniBeans.UserFormThree;
+import com.dsrc.base.MatrimoniBeans.UserFormTwo;
+import com.dsrc.base.MatrimoniService.MatrimoniServiceImplementation;;
+
+@RestController	
+@RequestMapping("/index")
+@CrossOrigin(origins = "http://localhost:4200",allowedHeaders = "*")
+public class MatrimoniController {
+	
+	@Autowired
+	public MatrimoniServiceImplementation matrimoniService;
+	
+	@GetMapping("/getadmin")
+	public List<Admin> getAdmin()
+	{
+		return matrimoniService.getAdmin();
+	}
+	
+	@GetMapping("/listusers")
+	public List<MatrimoniRegisteredUsers> listusers()
+	{
+		return matrimoniService.listusers();
+	}
+	
+	@DeleteMapping("/deleteuser/{userId}")
+	public boolean deleteuser(@PathVariable String userId)
+	{
+		matrimoniService.deleteUser(userId);
+		return true;
+	}
+
+	@PostMapping("/savenewuser")
+	public MatrimoniRegisteredUsers savenewuser(@RequestBody MatrimoniRegisteredUsers regbean)
+	{
+		return matrimoniService.savenewuser(regbean);
+	}
+
+	@PostMapping("/savenewuserform2")
+	public UserFormTwo savenewuserformtwo(@RequestBody UserFormTwo regbean)
+	{
+		return matrimoniService.savenewuserformtwo(regbean);
+	}
+
+	@PostMapping("/savenewuserform3")
+	public UserFormThree savenewuserformthree(@RequestBody UserFormThree regbean)
+	{	
+		return matrimoniService.savenewuserformthree(regbean);
+	}
+	
+	@GetMapping("/getformtwo/{userid}")
+	public UserFormTwo getuserformtwo(@PathVariable String userid)
+	{	
+	
+		return matrimoniService.getuserform2(userid);		
+	}
+	
+	@GetMapping("/getformthree/{userid}")
+	public UserFormThree getuserformthree(@PathVariable String userid)
+	{
+	
+		return matrimoniService.getuserform3(userid);		
+	}
+}
+
+
+DAO:
+package com.dsrc.base.MatrimoniDAO;
+
+import java.util.List;
+import com.dsrc.base.MatrimoniBeans.Admin;
+import com.dsrc.base.MatrimoniBeans.MatrimoniRegisteredUsers;
+import com.dsrc.base.MatrimoniBeans.UserFormThree;
+import com.dsrc.base.MatrimoniBeans.UserFormTwo;
+
+public interface MatrimoniDAO {
+	
+	public List<Admin> getAdmin();
+	public List<MatrimoniRegisteredUsers> listusers();
+	public boolean deleteUser(String userId);
+	public MatrimoniRegisteredUsers savenewuser(MatrimoniRegisteredUsers regbean);
+	public UserFormTwo savenewuserformtwo(UserFormTwo regbean);
+	public UserFormThree savenewuserformthree(UserFormThree regbean);
+	public UserFormTwo getuserform2(String userid);
+	public UserFormThree getuserform3(String userid);
+	
+}
+
+
+
+
+DAO impl:
+
+
+
+package com.dsrc.base.MatrimoniDAO;
+
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.stereotype.Repository;
+
+import com.dsrc.base.MatrimoniBeans.Admin;
+import com.dsrc.base.MatrimoniBeans.MatrimoniRegisteredUsers;
+import com.dsrc.base.MatrimoniBeans.UserFormThree;
+import com.dsrc.base.MatrimoniBeans.UserFormTwo;
+
+@Repository
+public class MatrimoniDAOImplementation implements MatrimoniDAO{
+	
+	@PersistenceContext
+    private EntityManager entityManger;
+	
+	
+	@Override
+	public  List<Admin> getAdmin() {
+			
+		List<Admin> adminlist = entityManger.createQuery("from Admin",Admin.class).getResultList();
+		
+		return adminlist;
+	}
+
+	@Override
+	public List<MatrimoniRegisteredUsers> listusers() {
+		
+		List<MatrimoniRegisteredUsers> listusers = entityManger.createQuery("from MatrimoniRegisteredUsers",MatrimoniRegisteredUsers.class).getResultList();
+		
+		return listusers;
+	}
+
+	@Override
+	public boolean deleteUser(String userId) {
+		
+		Query query = (Query) entityManger.createQuery("DELETE FROM MatrimoniRegisteredUsers WHERE userid = :userId ");
+		query.setParameter("userId", userId);
+		int delete=query.executeUpdate();
+		System.out.println("Rows Affected"+delete);
+		return true;
+	}
+
+	@Override
+	public MatrimoniRegisteredUsers savenewuser(MatrimoniRegisteredUsers regbean) {
+		
+		entityManger.persist(regbean);
+		return null;		
+	}
+
+	@Override
+	public UserFormTwo savenewuserformtwo(UserFormTwo regbean) {
+		
+		entityManger.persist(regbean);
+		return null;
+	}
+
+	@Override
+	public UserFormThree savenewuserformthree(UserFormThree regbean) {
+		entityManger.persist(regbean);
+		return null;
+	}
+
+	@Override
+	public UserFormTwo getuserform2(String userid) {
+		
+	 return entityManger.find(UserFormTwo.class, new String(userid));
+		
+	}
+
+	@Override
+	public UserFormThree getuserform3(String userid) {
+		
+		 return entityManger.find(UserFormThree.class, new String(userid));
+	}	
+}
+
+
+
+
+Matrimoni service:
+
+
+package com.dsrc.base.MatrimoniService;
+
+import java.util.List;
+
+import com.dsrc.base.MatrimoniBeans.Admin;
+import com.dsrc.base.MatrimoniBeans.MatrimoniRegisteredUsers;
+import com.dsrc.base.MatrimoniBeans.UserFormThree;
+import com.dsrc.base.MatrimoniBeans.UserFormTwo;
+
+public interface MatrimoniService {
+	
+	public List<Admin> getAdmin();
+	public List<MatrimoniRegisteredUsers> listusers();
+	public boolean deleteUser(String userId);
+	public MatrimoniRegisteredUsers savenewuser(MatrimoniRegisteredUsers regbean);
+	public UserFormTwo savenewuserformtwo(UserFormTwo regbean);
+	public UserFormThree savenewuserformthree(UserFormThree regbean);
+	public UserFormTwo getuserform2(String userid);
+	public UserFormThree getuserform3(String userid);
+
+}
+
+service impl:
+package com.dsrc.base.MatrimoniService;
+
+import java.util.List;
+
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.dsrc.base.MatrimoniBeans.Admin;
+import com.dsrc.base.MatrimoniBeans.MatrimoniRegisteredUsers;
+import com.dsrc.base.MatrimoniBeans.UserFormThree;
+import com.dsrc.base.MatrimoniBeans.UserFormTwo;
+import com.dsrc.base.MatrimoniDAO.MatrimoniDAOImplementation;
+
+@Service
+public class MatrimoniServiceImplementation implements MatrimoniService{
+
+	@Autowired
+	public MatrimoniDAOImplementation matrimoniDAO;
+	
+	@Override
+	@Transactional
+	public List<Admin> getAdmin() {
+		return matrimoniDAO.getAdmin();	
+	}
+
+	@Override
+	@Transactional
+	public List<MatrimoniRegisteredUsers> listusers() {
+		return matrimoniDAO.listusers();
+	}
+
+	@Override
+	@Transactional
+	public boolean deleteUser(String userId) {
+		matrimoniDAO.deleteUser(userId);
+		return true;
+	}
+
+	@Override
+	@Transactional
+	public MatrimoniRegisteredUsers savenewuser(MatrimoniRegisteredUsers regbean) {
+		
+		return matrimoniDAO.savenewuser(regbean);
+	}
+
+	@Override
+	@Transactional
+	public UserFormTwo savenewuserformtwo(UserFormTwo regbean) {
+		// TODO Auto-generated method stub
+		return matrimoniDAO.savenewuserformtwo(regbean);
+	}
+
+	@Override
+	@Transactional
+	public UserFormThree savenewuserformthree(UserFormThree regbean) {
+		
+		return matrimoniDAO.savenewuserformthree(regbean);
+	}
+@Override
+	public UserFormTwo getuserform2(String userid) {
+		
+		return matrimoniDAO.getuserform2(userid);
+	}
+
+	@Override
+	public UserFormThree getuserform3(String userid) {
+		// TODO Auto-generated method stub
+		return matrimoniDAO.getuserform3(userid);
+	}	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
